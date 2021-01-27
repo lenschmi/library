@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Lena's Library Logger</title>
+        <link href="style.css" rel="stylesheet" type="text/css" media="all">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    </head>
+    <body>
+        <header>
+            <h1>Lena's Library Logger</h1>
+        </header>
+        <main>
+            <div id="stats" class="pane">
+                <h2>My Bookish Statistics</h2>
+            </div>
+            <div id="my-books" class=pane>
+                <h2 id="my-books-h">My Books</h2>
+                <button id="add-book">+</button>
+                <div id="bookshelf">
+                    <!--Empty div to store book objects
+                        Contains three dummy divs so that all divs in the flexbox will stay the same size on screen resizing!-->
+                    <div class="placeholder"></div>
+                    <div class="placeholder"></div>
+                    <div class="placeholder"></div>
+                </div>
+            </div>
+            <div id="fullscreen-container" class="hide">
+                <div class="pop-up">
+                    <h2 id="pop-header">Book Details</h2>
+                    <form>
+                        <div class="input"><label for="ip-title">Title<input id="ip-title" type="text" name="title" required></input></label></div>
+                        <div class="input"><label for="ip-author">Author<input id="ip-author" type="text" name="author" required></input></label></div>
+                        <div class="input"><label for="ip-pages">Pages<input id="ip-pages" type="number" min="0" name="pages" required></input></label></div>
+                        <div class="input"><label for="ip-read">Read?<input id="ip-read" type="checkbox" names="isRead"></input></label></div>
+                        <div>
+                            <button id="submit" type="submit">Add Book</button>
+                            <button id="cancel" type="button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <script type="text/javascript" src="library.js"></script>
+    </body>
+</html>
