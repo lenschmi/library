@@ -22,10 +22,17 @@ h1, h2{
     margin: 0 0 .5em 0;
 }
 
+.pane{
+    border-radius: 6px;
+    margin: .5rem;
+}
+
 #stats{
     background-color: lightsteelblue;
     flex: 1 1 300px;
 }
+
+/*My Books Pane Style*/
 
 #my-books{
     background-color: lightsteelblue;
@@ -42,15 +49,20 @@ h1, h2{
     width: 42px;
 }
 
-.pane{
-    border-radius: 6px;
-    margin: .5rem;
-}
-
 #bookshelf{
     display: flex;
     flex-direction: horizontal;
     flex-wrap: wrap;
+}
+
+#filter-label{
+    margin-left: 1em;
+}
+
+#filter{
+    margin-left: .5em;
+    padding: .25em;
+    font-size: 1em;
 }
 
 /*Book and dummy book divs*/
