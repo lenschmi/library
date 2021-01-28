@@ -4,8 +4,6 @@ function Book(title, author, pageCount, isRead){
     this.author = author;
     this.pageCount = pageCount;
     this.isRead = isRead;
-    //The user's timezone will be stored
-    this.date = new Date();
 }
 
 Book.prototype.getBookInfo = function(){
@@ -16,38 +14,63 @@ Book.prototype.getBookInfo = function(){
 
 Book.prototype.toggleIsRead = function(){
     this.isRead = !(this.isRead);
-    saveToLocalStorage();
 };
 
 //An edit function would be nice to implement
 
-//Library array and functions to manipulate it
-let myLibrary = [];
-let currLibrary = myLibrary;
+//Library object and functions to manipulate it
+function Library(books){
+    //Creates an empty library meant to store Book objects
+    this.books = [];
+}
 
-function addBookToLibrary(title, author, pageCount, isRead){
+Library.prototype.appendBooks = function(newBooks){
+    this.books = this.books.concat(newBooks);
+}
+
+Library.prototype.addBookToLibrary = function(title, author, pageCount, isRead){
     let newBook = new Book(title, author, pageCount, isRead);
-    myLibrary.push(newBook);
-    saveToLocalStorage();
-    //Display book
-    let index = myLibrary.length -1;
-    let div = displayBook(index);
+    this.books.push(newBook);
 }
 
-function deleteBookFromLibrary(index){
-    delete myLibrary[index];
-    saveToLocalStorage();
+Library.prototype.deleteBookFromLibrary = function(index){
+    delete this.books[index];
 }
 
-function sortLibrary(){
-    //Returns sorted library
+Library.prototype.sortLibraryByTitle = function(){
+    //Returns library sorted by title
+    let newLib = new Library();
+    const sortedBooks = this.books.sort(function(book1, book2){
+        if (book1.title < book2.title) return -1;
+        else if (book1.title > book2.title) return 1;
+        return 0;
+    });
+    newLib.appendBooks(sortedBooks);
+    return newLib;
 }
 
-function filterLibrary(){
+Library.prototype.filterLibrary = function(filterMethod){
     //Returns filtered library
+    let newLib = new Library();
+    switch(filterMethod){
+        case "Unread":
+            newLib.appendBooks(this.books.filter(book => !book.isRead));
+            return newLib;
+        case "Read":
+            newLib.appendBooks(this.books.filter(book => book.isRead));
+            return newLib;
+        default:
+            return;
+    }   
 }
 
 //Functions for manipulating the displayed books
+let myLibrary = new Library; //The overall library
+//let currLibrary = myLibrary; //The currently displayed library
+//These could be enumerated
+let currFilter = "all";
+let currSort = "none";
+
 function displayBook(index){
     let div = document.createElement("div");
     div.setAttribute("class", "book");
@@ -76,7 +99,7 @@ function displayBook(index){
 
 function updateBookDisplay(index){
     let bookDiv = document.getElementById(`${index}`);
-    let book = myLibrary[index];
+    let book = myLibrary.books[index];
     let isRead = book.isRead ? "Read":"Unread";
     let notIsRead = book.isRead ? "Unread":"Read";
     bookDiv.querySelector(".title").textContent= `${book.title}`;
@@ -89,27 +112,38 @@ function updateBookDisplay(index){
 function displayLibrary(library){
     //Function to display every book in a library array
     //Possibly want to delete all books from HTML first (so that this can be used to reload a sorted library)
-    library.forEach(book => {
-        let index = library.indexOf(book);
+    library.books.forEach(book => {
+        let index = library.books.indexOf(book);
         displayBook(index);
     });
 }
 
 function removeBookFromDisplay(index){
-    deleteBookFromLibrary(index);
+    myLibrary.deleteBookFromLibrary(index);
+    saveToLocalStorage();
     //Remove from DOM
     let bookshelfDiv = document.querySelector("div#bookshelf");
     let book = document.getElementById(`${index}`);
     bookshelfDiv.removeChild(book);
     //Update stats
+
 }
 
-function displaySortedLibrary(library, sortMethod){
-    //Sort by date added or title or author last name(?)
+function displaySortedLibrary(sortMethod){
+    switch(sortMethod){
+        case "title":
+            currLibrary = sortLibraryByTitle();
+        case "author":
+            currLibrary = myLibrary;
+        default: 
+            currLibrary = myLibrary;
+    }
+    displayLibrary(currLibrary);
 }
 
-function displayFilteredLibrary(){
-    //Filter on read or unread
+function displayFilteredLibrary(filterMethod){
+    currLibrary = filterLibrary(filterMethod);
+    displayLibrary(currLibrary);
 }
 
 //Functions to display and update Bookish Stats
@@ -135,7 +169,10 @@ document.querySelector("form").addEventListener("submit", function(e){
     let pages = parseInt(document.getElementById("ip-pages").value);
     let isRead = document.getElementById("ip-read").checked;
     if (title && author && pages>=0){
-        addBookToLibrary(title, author, pages, isRead);
+        myLibrary.addBookToLibrary(title, author, pages, isRead);
+        let index = myLibrary.books.length -1;
+        displayBook(index);
+        saveToLocalStorage();
     }
     clearForm();
     document.getElementById("fullscreen-container").className = "hide";
@@ -162,25 +199,31 @@ document.querySelector("#bookshelf").addEventListener("click", function(e){
         removeBookFromDisplay(id);
     } else if (e.target.classList.contains("toggle")){
         let id = parseInt(e.target.parentNode.id);
-        myLibrary[id].toggleIsRead();
+        myLibrary.books[id].toggleIsRead();
         updateBookDisplay(id);
+        saveToLocalStorage();
     }
 });
 
+//Filter event listener
+
+
 //Using localStorage to save the library array
 function saveToLocalStorage() {
-    //This assuming that local storage is available
-    localStorage.setItem("myLibrary", JSON.stringify(myLibrary));
+    //This is assuming that local storage is available
+    localStorage.setItem("myLibrary", JSON.stringify(myLibrary.books));
 }
   
 function loadFromLocalStorage() {
-    myLibrary = JSON.parse(localStorage.getItem("myLibrary"));
-    if (myLibrary === null) myLibrary = [];
-    myLibrary = myLibrary.filter(x => x !== null);
-    for (let i=0; i<myLibrary.length; i++){
-        let book = myLibrary[i];
-        book = new Book(book.title, book.author, book.pageCount, book.isRead);
-        myLibrary[i] = book;
+    let storedBooks = JSON.parse(localStorage.getItem("myLibrary"));
+    if (storedBooks !== null){
+        storedBooks = storedBooks.filter(x => x !== null);
+        for (let i=0; i<storedBooks.length; i++){
+            let book = storedBooks[i];
+            book = new Book(book.title, book.author, book.pageCount, book.isRead);
+            storedBooks[i] = book;
+        }
+        myLibrary.appendBooks(storedBooks);
     }
     displayLibrary(myLibrary);
 }
@@ -188,3 +231,13 @@ function loadFromLocalStorage() {
 loadFromLocalStorage();
 
 
+//TODO
+/*
+- Add Firebase storage option
+- Adding filtering and sorting options
+- Add statistics support
+- Add support for editing a book
+- Include css reset file
+- Move buttons on book cards to bottom of card
+- May want to change to a grid (from flexbox)
+*/

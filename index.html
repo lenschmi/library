@@ -17,6 +17,12 @@
             <div id="my-books" class=pane>
                 <h2 id="my-books-h">My Books</h2>
                 <button id="add-book">+</button>
+                <label for="filter"> Filter:</label>
+                <select name="filter" id="filter">
+                    <option value="all">All</option>
+                    <option value="unread">Unread</option>
+                    <option value="read">Read</option>
+                </select>
                 <div id="bookshelf">
                     <!--Empty div to store book objects
                         Contains three dummy divs so that all divs in the flexbox will stay the same size on screen resizing!-->
