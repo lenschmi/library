@@ -1,9 +1,10 @@
 //Book object definition and functions
-function Book(title, author, pageCount, isRead){
+function Book(title, author, pageCount, isRead, bookId){
     this.title = title;
     this.author = author;
     this.pageCount = pageCount;
     this.isRead = isRead;
+    this.bookId = bookId;
 }
 
 Book.prototype.getBookInfo = function(){
@@ -16,8 +17,6 @@ Book.prototype.toggleIsRead = function(){
     this.isRead = !(this.isRead);
 };
 
-//An edit function would be nice to implement
-
 //Library object and functions to manipulate it
 function Library(books){
     //Creates an empty library meant to store Book objects
@@ -28,8 +27,8 @@ Library.prototype.appendBooks = function(newBooks){
     this.books = this.books.concat(newBooks);
 }
 
-Library.prototype.addBookToLibrary = function(title, author, pageCount, isRead){
-    let newBook = new Book(title, author, pageCount, isRead);
+Library.prototype.addBookToLibrary = function(title, author, pageCount, isRead, bookId){
+    let newBook = new Book(title, author, pageCount, isRead, bookId);
     this.books.push(newBook);
 }
 
@@ -37,39 +36,26 @@ Library.prototype.deleteBookFromLibrary = function(index){
     delete this.books[index];
 }
 
-Library.prototype.sortLibraryByTitle = function(){
-    //Returns library sorted by title
-    let newLib = new Library();
-    const sortedBooks = this.books.sort(function(book1, book2){
-        if (book1.title < book2.title) return -1;
-        else if (book1.title > book2.title) return 1;
-        return 0;
-    });
-    newLib.appendBooks(sortedBooks);
-    return newLib;
-}
-
 Library.prototype.filterLibrary = function(filterMethod){
     //Returns filtered library
     let newLib = new Library();
     switch(filterMethod){
-        case "Unread":
+        case "unread":
             newLib.appendBooks(this.books.filter(book => !book.isRead));
             return newLib;
-        case "Read":
+        case "read":
             newLib.appendBooks(this.books.filter(book => book.isRead));
             return newLib;
         default:
-            return;
+            return this;
     }   
 }
 
 //Functions for manipulating the displayed books
 let myLibrary = new Library; //The overall library
-//let currLibrary = myLibrary; //The currently displayed library
-//These could be enumerated
+let currLibrary = myLibrary; //The currently displayed library
+//This could be enumerated
 let currFilter = "all";
-let currSort = "none";
 
 function displayBook(index){
     let div = document.createElement("div");
@@ -99,7 +85,7 @@ function displayBook(index){
 
 function updateBookDisplay(index){
     let bookDiv = document.getElementById(`${index}`);
-    let book = myLibrary.books[index];
+    let book = currLibrary.books[index];
     let isRead = book.isRead ? "Read":"Unread";
     let notIsRead = book.isRead ? "Unread":"Read";
     bookDiv.querySelector(".title").textContent= `${book.title}`;
@@ -107,19 +93,34 @@ function updateBookDisplay(index){
     bookDiv.querySelector(".page-count").textContent = `Page Count: ${book.pageCount}`;
     bookDiv.querySelector(".is-read").textContent = `${isRead}`;
     bookDiv.querySelector(".toggle").textContent = `Mark ${notIsRead}`;
+    bookDiv.setAttribute("data-bookId", `${book.bookId}`);
 }
 
-function displayLibrary(library){
-    //Function to display every book in a library array
-    //Possibly want to delete all books from HTML first (so that this can be used to reload a sorted library)
-    library.books.forEach(book => {
-        let index = library.books.indexOf(book);
-        displayBook(index);
+function displayLibrary(){
+    //Function to display every book in the currLibrary
+
+    //Clear bookshelf
+    let bookshelfDiv = document.querySelector("div#bookshelf");
+    let bookDivs = document.querySelectorAll("div.book");
+    bookDivs.forEach(div => bookshelfDiv.removeChild(div));
+
+    //Load library
+    currLibrary.books.forEach(book => {
+        if (book){
+            let index = currLibrary.books.indexOf(book);
+            displayBook(index);
+        }
     });
 }
 
-function removeBookFromDisplay(index){
-    myLibrary.deleteBookFromLibrary(index);
+function removeBookFromDisplay(bookId, index){
+    //Delete the book from both the main library and the current library
+    if (currLibrary === myLibrary){
+        myLibrary.deleteBookFromLibrary(index);
+    } else{
+        myLibrary.deleteBookFromLibrary(bookId);
+        currLibrary.deleteBookFromLibrary(index);
+    }
     saveToLocalStorage();
     //Remove from DOM
     let bookshelfDiv = document.querySelector("div#bookshelf");
@@ -129,21 +130,9 @@ function removeBookFromDisplay(index){
 
 }
 
-function displaySortedLibrary(sortMethod){
-    switch(sortMethod){
-        case "title":
-            currLibrary = sortLibraryByTitle();
-        case "author":
-            currLibrary = myLibrary;
-        default: 
-            currLibrary = myLibrary;
-    }
-    displayLibrary(currLibrary);
-}
-
 function displayFilteredLibrary(filterMethod){
-    currLibrary = filterLibrary(filterMethod);
-    displayLibrary(currLibrary);
+    currLibrary = myLibrary.filterLibrary(filterMethod);
+    displayLibrary();
 }
 
 //Functions to display and update Bookish Stats
@@ -153,6 +142,24 @@ function displayStats(){
 
 function updateStats(){
     //To be called when any changes are made to the library
+}
+
+function addTestBooks(n){
+    //Add n test books to the library
+    for (let i=0; i< n; i++){
+        let bookId = myLibrary.books.length;
+        myLibrary.addBookToLibrary(`Test Book ${i}`, "author", 123, "read", bookId);
+        if(currLibrary === myLibrary){
+            let index = myLibrary.books.length -1;
+            displayBook(index);
+        } else{
+            currLibrary = myLibrary;
+            displayLibrary(currLibrary);
+            document.querySelector("#filter").selectedIndex = 0;
+            currFilter = "all";
+        }
+    }
+    saveToLocalStorage();
 }
 
 //Event listeners
@@ -169,9 +176,17 @@ document.querySelector("form").addEventListener("submit", function(e){
     let pages = parseInt(document.getElementById("ip-pages").value);
     let isRead = document.getElementById("ip-read").checked;
     if (title && author && pages>=0){
-        myLibrary.addBookToLibrary(title, author, pages, isRead);
-        let index = myLibrary.books.length -1;
-        displayBook(index);
+        let bookId = myLibrary.books.length;
+        myLibrary.addBookToLibrary(title, author, pages, isRead, bookId);
+        if(currLibrary === myLibrary){
+            let index = myLibrary.books.length -1;
+            displayBook(index);
+        } else{
+            currLibrary = myLibrary;
+            displayLibrary(currLibrary);
+            document.querySelector("#filter").selectedIndex = 0;
+            currFilter = "all";
+        }
         saveToLocalStorage();
     }
     clearForm();
@@ -196,17 +211,33 @@ function clearForm(){
 document.querySelector("#bookshelf").addEventListener("click", function(e){
     if(e.target.classList.contains("delete")){
         let id = parseInt(e.target.parentNode.id);
-        removeBookFromDisplay(id);
+        //Get the book based on the id
+        let bookDiv = document.getElementById(`${id}`);
+        let bookId = bookDiv.getAttribute("data-bookId");
+        removeBookFromDisplay(bookId, id);
     } else if (e.target.classList.contains("toggle")){
         let id = parseInt(e.target.parentNode.id);
-        myLibrary.books[id].toggleIsRead();
-        updateBookDisplay(id);
+        //Get the book based on the id
+        let bookDiv = document.getElementById(`${id}`);
+        let bookId = bookDiv.getAttribute("data-bookId");
+        myLibrary.books[bookId].toggleIsRead();
+        if (currFilter !== "all"){
+            displayFilteredLibrary(currFilter);
+        } else{
+            updateBookDisplay(id);
+        } 
         saveToLocalStorage();
     }
 });
 
-//Filter event listener
-
+//Filter on Read/Unread
+document.querySelector("#filter").addEventListener("change", function(e){
+    let filterType = e.target.value;
+    if (filterType !== currFilter){
+        displayFilteredLibrary(filterType);
+        currFilter = filterType;
+    }
+});
 
 //Using localStorage to save the library array
 function saveToLocalStorage() {
@@ -220,12 +251,13 @@ function loadFromLocalStorage() {
         storedBooks = storedBooks.filter(x => x !== null);
         for (let i=0; i<storedBooks.length; i++){
             let book = storedBooks[i];
-            book = new Book(book.title, book.author, book.pageCount, book.isRead);
+            //Set the bookId to match it's index in the main library array
+            book = new Book(book.title, book.author, book.pageCount, book.isRead, i);
             storedBooks[i] = book;
         }
         myLibrary.appendBooks(storedBooks);
     }
-    displayLibrary(myLibrary);
+    displayLibrary();
 }
 
 loadFromLocalStorage();
@@ -234,10 +266,13 @@ loadFromLocalStorage();
 //TODO
 /*
 - Add Firebase storage option
-- Adding filtering and sorting options
 - Add statistics support
-- Add support for editing a book
 - Include css reset file
-- Move buttons on book cards to bottom of card
 - May want to change to a grid (from flexbox)
+
+- Missing features:
+    - Editing books
+    - Error checking on multiple matching books (you may or may not want this since you might have multiple copies of the same book, multiple translatiosn etc.)
+    - More information about the book (genre, edition etc.)
+    - Sorting options
 */
