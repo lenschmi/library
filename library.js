@@ -126,8 +126,6 @@ function removeBookFromDisplay(bookId, index){
     let bookshelfDiv = document.querySelector("div#bookshelf");
     let book = document.getElementById(`${index}`);
     bookshelfDiv.removeChild(book);
-    //Update stats
-
 }
 
 function displayFilteredLibrary(filterMethod){
@@ -137,11 +135,24 @@ function displayFilteredLibrary(filterMethod){
 
 //Functions to display and update Bookish Stats
 function displayStats(){
-
+    let div = document.createElement("div");
+    div.setAttribute("id", "stat-details");
+    div.innerHTML = `<p class="stat">Total books: <span id='total-books'></span></p>
+                    <p class="stat">Total read: <span id='total-read'></span></p>
+                    <p class="stat">Total unread: <span id='total-unread'></span></p>`;
+    let statsPane= document.querySelector("div#stats");
+    statsPane.appendChild(div);
+    updateStats();
 }
 
 function updateStats(){
-    //To be called when any changes are made to the library
+    let stats = document.querySelector("div#stat-details");
+
+    let readCount = myLibrary.filterLibrary("read").books.length;
+    let unreadCount = myLibrary.filterLibrary("unread").books.length;
+    stats.querySelector("span#total-books").textContent = `${readCount+unreadCount}`;
+    stats.querySelector("span#total-read").textContent = `${readCount}`;
+    stats.querySelector("span#total-unread").textContent = `${unreadCount}`;
 }
 
 function addTestBooks(n){
@@ -159,6 +170,7 @@ function addTestBooks(n){
             currFilter = "all";
         }
     }
+    updateStats();
     saveToLocalStorage();
 }
 
@@ -187,6 +199,7 @@ document.querySelector("form").addEventListener("submit", function(e){
             document.querySelector("#filter").selectedIndex = 0;
             currFilter = "all";
         }
+        updateStats();
         saveToLocalStorage();
     }
     clearForm();
@@ -215,6 +228,7 @@ document.querySelector("#bookshelf").addEventListener("click", function(e){
         let bookDiv = document.getElementById(`${id}`);
         let bookId = bookDiv.getAttribute("data-bookId");
         removeBookFromDisplay(bookId, id);
+        updateStats();
     } else if (e.target.classList.contains("toggle")){
         let id = parseInt(e.target.parentNode.id);
         //Get the book based on the id
@@ -226,6 +240,7 @@ document.querySelector("#bookshelf").addEventListener("click", function(e){
         } else{
             updateBookDisplay(id);
         } 
+        updateStats();
         saveToLocalStorage();
     }
 });
@@ -261,18 +276,4 @@ function loadFromLocalStorage() {
 }
 
 loadFromLocalStorage();
-
-
-//TODO
-/*
-- Add Firebase storage option
-- Add statistics support
-- Include css reset file
-- May want to change to a grid (from flexbox)
-
-- Missing features:
-    - Editing books
-    - Error checking on multiple matching books (you may or may not want this since you might have multiple copies of the same book, multiple translatiosn etc.)
-    - More information about the book (genre, edition etc.)
-    - Sorting options
-*/
+displayStats();

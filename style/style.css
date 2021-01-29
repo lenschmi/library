@@ -18,8 +18,19 @@ main{
 }
 
 h1, h2{
-    padding: 1.5em .5em .5em 1em;
+    padding: 1.5em .5em 1em 1em;
     margin: 0 0 .5em 0;
+}
+
+
+h1{
+    font-size: 2em;
+    font-weight: bold;
+}
+
+h2{
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 .pane{
@@ -36,7 +47,7 @@ h1, h2{
 
 #my-books{
     background-color: lightsteelblue;
-    flex: 4 1 300px;
+    flex: 4 1 400px;
 }
 
 #my-books-h{
@@ -68,15 +79,16 @@ h1, h2{
 /*Book and dummy book divs*/
 
 h3{
+    font-weight: bold;
     font-size: 1rem;
     margin-bottom: 0;
+    margin: 1em 0 .5em 0;
 }
 
 .book, .placeholder{
-    flex: 1 1 200px;
+    flex: 1 1 229px;
     margin: 1rem;
     padding: 1em;
-    min-width: 229px;
 }
 
 .book{
@@ -98,6 +110,12 @@ h3{
     font-size: 1rem;
     margin-top: 1em;
     width: 7em;
+}
+
+/*Stats Pane*/
+p.stat{
+    margin: 1em;
+    font-weight: bold;
 }
 
 /*Pop-up style*/
