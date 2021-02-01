@@ -10,7 +10,6 @@ The project description can be found [HERE](https://www.theodinproject.com/cours
 - The layout of the book cards was done using a CSS flexbox and some invisible dummy books. I'm not happy with this implementation and will probably change it to a grid.
 - I implemented storage of user books in local storage, but have not yet added Firebase support. The curriculum hasn't yet covered any other data storage techniques.
 - I added a filter feature that allows for filtering on read or unread books. If you add books the filter is removed.
-- This was developed in Chrome. There seem to be some stylistic differences in Firefox's user stylesheet that weren't covered by the reset style I used. I'm not going to update for this project, but will improve this for future work.
 
 
 **TO DO**
