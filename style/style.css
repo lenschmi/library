@@ -110,6 +110,7 @@ h3{
     font-size: 1rem;
     margin-top: 1em;
     width: 7em;
+    padding: 2px 6px;
 }
 
 /*Stats Pane*/
@@ -157,7 +158,7 @@ div.input{
 }
 
 input[type="text"], input[type="number"]{
-    margin: 0;
+    margin-top: .5em;
     font-size: 1em;
     width: 100%;
     box-sizing: border-box;
@@ -176,6 +177,7 @@ label{
 
 button#submit, button#cancel{
     margin: .5em .5em 2em .5em;
+    padding: 2px 6px;
     font-size: 1.25em;
     width: 5.5em;
 }
