@@ -137,9 +137,9 @@ function displayFilteredLibrary(filterMethod){
 function displayStats(){
     let div = document.createElement("div");
     div.setAttribute("id", "stat-details");
-    div.innerHTML = `<p class="stat">Total books: <span id='total-books'></span></p>
-                    <p class="stat">Total read: <span id='total-read'></span></p>
-                    <p class="stat">Total unread: <span id='total-unread'></span></p>`;
+    div.innerHTML = `<p class="stat"><b>Total books:</b> <span id='total-books'></span></p>
+                    <p class="stat"><b>Total read:</b> <span id='total-read'></span></p>
+                    <p class="stat"><b>Total unread:</b> <span id='total-unread'></span></p>`;
     let statsPane= document.querySelector("div#stats");
     statsPane.appendChild(div);
     updateStats();
