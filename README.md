@@ -1,8 +1,11 @@
 # library
 
-Odin Project Full Stack JavaScript Path Library Project.
+Odin Project Full Stack JavaScript Path [Library Project](https://www.theodinproject.com/courses/javascript/lessons/library). View [demo](https://lenschmi.github.io/library/).
 
-The project description can be found [HERE](https://www.theodinproject.com/courses/javascript/lessons/library). This mini project was meant to provide some practice using objects, object constructors and prototypes in JavaScript and was done after completing this [lesson](https://www.theodinproject.com/courses/javascript/lessons/objects-and-object-constructors).
+![library_demo2](https://user-images.githubusercontent.com/61850952/140663136-17bf201b-275a-4a15-bdff-56c121289bfe.png)
+![library_demo1](https://user-images.githubusercontent.com/61850952/140663137-84fbcb47-82cf-4ddf-84a8-04e851cbf196.png)
+
+This mini project was meant to provide some practice using objects, object constructors and prototypes in JavaScript and was done after completing this [lesson](https://www.theodinproject.com/courses/javascript/lessons/objects-and-object-constructors).
 
 **Project Notes**
 - This project was fun to think about since I read a lot and use [The StoryGraph](https://app.thestorygraph.com/) for tracking my books. This made me think a bit about what might have gone into such a website.
